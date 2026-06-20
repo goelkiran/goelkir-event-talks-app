@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Explorer</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Glass) -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>BQ Notes</h1>
+                    <span>Release Hub</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="feed">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Release Feed</span>
+                </button>
+                <button class="nav-item" data-tab="simulation">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <span>Simulated Tweets</span>
+                    <span class="badge-count" id="sim-count">0</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="sync-status">Ready</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h2>BigQuery Release Explorer</h2>
+                    <p class="subtitle">Stay updated with Google BigQuery feed releases & share key insights</p>
+                </div>
+                <div class="header-actions">
+                    <span class="last-updated-text" id="last-updated">Last checked: Never</span>
+                    <button class="btn btn-primary" id="btn-refresh">
+                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                        <span>Refresh Feed</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Grid Content -->
+            <div class="content-grid" id="tab-feed">
+                <!-- Left: List of releases -->
+                <section class="feed-section">
+                    <!-- Filters & Search Toolbar -->
+                    <div class="toolbar-card">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="search-input" placeholder="Search releases by keyword, date, or feature...">
+                        </div>
+                        <div class="filter-pills-container">
+                            <span class="filter-label">Filter:</span>
+                            <div class="filter-pills" id="category-filters">
+                                <button class="filter-pill active" data-category="all">All</button>
+                                <button class="filter-pill" data-category="feature">Features</button>
+                                <button class="filter-pill" data-category="changed">Changes</button>
+                                <button class="filter-pill" data-category="deprecated">Deprecated</button>
+                                <button class="filter-pill" data-category="general">General</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Release Notes List Container -->
+                    <div class="notes-container" id="notes-list">
+                        <!-- Loading skeleton / state -->
+                        <div class="loading-state" id="loading-state">
+                            <div class="spinner-large"></div>
+                            <p>Fetching BigQuery release notes...</p>
+                        </div>
+                        
+                        <!-- Empty state -->
+                        <div class="empty-state hidden" id="empty-state">
+                            <i class="fa-regular fa-folder-open"></i>
+                            <h3>No releases found</h3>
+                            <p>Try refining your search queries or filter categories.</p>
+                        </div>
+
+                        <!-- Notes list will be dynamically rendered here -->
+                    </div>
+                </section>
+
+                <!-- Right: Tweet / Share Workspace (Sticky) -->
+                <section class="share-workspace">
+                    <div class="sticky-card-wrapper">
+                        <!-- Selected Card Details Preview -->
+                        <div class="preview-panel-card" id="preview-panel">
+                            <div class="preview-empty-state" id="preview-empty">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <h3>No Update Selected</h3>
+                                <p>Select any release note card on the left to activate the Social Share Workspace.</p>
+                            </div>
+
+                            <div class="preview-content hidden" id="preview-active-content">
+                                <div class="workspace-header">
+                                    <span class="workspace-tag">Social Workspace</span>
+                                    <div class="workspace-actions">
+                                        <button class="icon-btn" id="btn-copy-link" title="Copy original link">
+                                            <i class="fa-solid fa-link"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="selected-details">
+                                    <div class="details-meta">
+                                        <span class="details-date" id="selected-date"></span>
+                                        <span class="badge" id="selected-badge"></span>
+                                    </div>
+                                    <h4 class="details-title" id="selected-title">Release Details</h4>
+                                    <div class="details-body-html" id="selected-body"></div>
+                                </div>
+
+                                <!-- Twitter/X Composer Card Mock -->
+                                <div class="tweet-composer-card">
+                                    <div class="tweet-header">
+                                        <div class="tweet-profile">
+                                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar">
+                                            <div class="profile-names">
+                                                <span class="display-name">Cloud Architect</span>
+                                                <span class="handle">@bq_navigator</span>
+                                            </div>
+                                        </div>
+                                        <div class="twitter-x-logo">
+                                            <i class="fa-brands fa-x-twitter"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="tweet-body">
+                                        <textarea id="tweet-textarea" rows="5" maxlength="280" placeholder="What is happening? Draft your update..."></textarea>
+                                    </div>
+
+                                    <div class="tweet-footer">
+                                        <div class="character-counter">
+                                            <div class="progress-ring-container">
+                                                <svg class="progress-ring" width="24" height="24">
+                                                    <circle class="progress-ring__circle-bg" stroke="#1f2937" stroke-width="2" fill="transparent" r="9" cx="12" cy="12"/>
+                                                    <circle class="progress-ring__circle" stroke="#1d9bf0" stroke-width="2" fill="transparent" r="9" cx="12" cy="12"/>
+                                                </svg>
+                                                <span id="char-count">280</span>
+                                            </div>
+                                        </div>
+                                        <div class="tweet-actions-group">
+                                            <button class="btn btn-secondary btn-sm" id="btn-copy-text" title="Copy text to clipboard">
+                                                <i class="fa-regular fa-copy"></i> Copy
+                                            </button>
+                                            <button class="btn btn-accent btn-sm" id="btn-simulate-tweet">
+                                                <i class="fa-solid fa-flask"></i> Simulate
+                                            </button>
+                                            <button class="btn btn-twitter btn-sm" id="btn-post-twitter">
+                                                <i class="fa-brands fa-x-twitter"></i> Post
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Simulated Feed Workspace (Alternative Tab) -->
+            <div class="simulated-workspace-tab hidden" id="tab-simulation">
+                <div class="tab-header">
+                    <h3>Simulated Social Feed</h3>
+                    <p>Behold how your customized release updates appear when posted. These are logged in-memory locally in this session.</p>
+                </div>
+                <div class="sim-feed-container" id="simulated-tweets-feed">
+                    <div class="sim-empty-state" id="sim-empty">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <h3>Your feed is empty</h3>
+                        <p>Select a release note in the main tab, draft your tweet, and click "Simulate" to see it live here!</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
