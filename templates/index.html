@@ -88,16 +88,26 @@
                     <div class="toolbar-card">
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="search-input" placeholder="Search releases by keyword, date, or feature...">
+                            <input type="text" id="search-input" placeholder="Search releases by keyword, date, source, or feature...">
                         </div>
                         <div class="filter-pills-container">
-                            <span class="filter-label">Filter:</span>
+                            <span class="filter-label">Category:</span>
                             <div class="filter-pills" id="category-filters">
                                 <button class="filter-pill active" data-category="all">All</button>
                                 <button class="filter-pill" data-category="feature">Features</button>
                                 <button class="filter-pill" data-category="changed">Changes</button>
                                 <button class="filter-pill" data-category="deprecated">Deprecated</button>
                                 <button class="filter-pill" data-category="general">General</button>
+                            </div>
+                        </div>
+                        <div class="filter-pills-container">
+                            <span class="filter-label">Source:</span>
+                            <div class="filter-pills" id="source-filters">
+                                <button class="filter-pill active" data-source="all">All Sources</button>
+                                <button class="filter-pill" data-source="BigQuery">BigQuery</button>
+                                <button class="filter-pill" data-source="PySpark">PySpark</button>
+                                <button class="filter-pill" data-source="Snowflake">Snowflake</button>
+                                <button class="filter-pill" data-source="Oracle 26ai">Oracle 26ai</button>
                             </div>
                         </div>
                     </div>
@@ -145,6 +155,7 @@
                                 <div class="selected-details">
                                     <div class="details-meta">
                                         <span class="details-date" id="selected-date"></span>
+                                        <span class="badge" id="selected-source-badge"></span>
                                         <span class="badge" id="selected-badge"></span>
                                     </div>
                                     <h4 class="details-title" id="selected-title">Release Details</h4>

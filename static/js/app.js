@@ -5,6 +5,7 @@ const state = {
     selectedRelease: null,
     simulatedTweets: [],
     currentCategoryFilter: 'all',
+    currentSourceFilter: 'all',
     searchQuery: '',
     isLoading: false
 };
@@ -23,6 +24,7 @@ const elements = {
     emptyState: document.getElementById('empty-state'),
     searchInput: document.getElementById('search-input'),
     categoryFilters: document.getElementById('category-filters'),
+    sourceFilters: document.getElementById('source-filters'),
     btnExport: document.getElementById('btn-export'),
     themeCheckbox: document.getElementById('theme-checkbox'),
     
@@ -31,6 +33,7 @@ const elements = {
     previewEmpty: document.getElementById('preview-empty'),
     previewActiveContent: document.getElementById('preview-active-content'),
     selectedDate: document.getElementById('selected-date'),
+    selectedSourceBadge: document.getElementById('selected-source-badge'),
     selectedBadge: document.getElementById('selected-badge'),
     selectedTitle: document.getElementById('selected-title'),
     selectedBody: document.getElementById('selected-body'),
@@ -107,6 +110,21 @@ function setupEventListeners() {
             // Add active class to clicked pill
             e.target.classList.add('active');
             state.currentCategoryFilter = e.target.dataset.category;
+            filterAndRenderNotes();
+        }
+    });
+    
+    // Source filter pills
+    elements.sourceFilters.addEventListener('click', (e) => {
+        if (e.target.classList.contains('filter-pill')) {
+            // Remove active class from all pills
+            elements.sourceFilters.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.classList.remove('active');
+            });
+            
+            // Add active class to clicked pill
+            e.target.classList.add('active');
+            state.currentSourceFilter = e.target.dataset.source;
             filterAndRenderNotes();
         }
     });
@@ -252,6 +270,7 @@ function filterAndRenderNotes() {
         const matchSearch = state.searchQuery === '' || 
             item.date.toLowerCase().includes(state.searchQuery) ||
             item.category.toLowerCase().includes(state.searchQuery) ||
+            item.source.toLowerCase().includes(state.searchQuery) ||
             item.content_text.toLowerCase().includes(state.searchQuery);
             
         // Category pill filter matching
@@ -260,7 +279,13 @@ function filterAndRenderNotes() {
             matchCategory = item.category.toLowerCase() === state.currentCategoryFilter;
         }
         
-        return matchSearch && matchCategory;
+        // Source pill filter matching
+        let matchSource = true;
+        if (state.currentSourceFilter !== 'all') {
+            matchSource = item.source === state.currentSourceFilter;
+        }
+        
+        return matchSearch && matchCategory && matchSource;
     });
     
     // Render list
@@ -286,9 +311,17 @@ function filterAndRenderNotes() {
         else if (cat.includes('changed')) tagClass = 'badge-changed';
         else if (cat.includes('deprecat') || cat.includes('remove')) tagClass = 'badge-deprecated';
         
+        // Source specific tag class
+        let sourceTagClass = 'badge-source-bq';
+        const src = item.source.toLowerCase();
+        if (src.includes('pyspark')) sourceTagClass = 'badge-source-pyspark';
+        else if (src.includes('snowflake')) sourceTagClass = 'badge-source-snowflake';
+        else if (src.includes('oracle')) sourceTagClass = 'badge-source-oracle';
+        
         card.innerHTML = `
             <div class="card-header">
                 <div class="card-meta">
+                    <span class="badge ${sourceTagClass}">${item.source}</span>
                     <span class="badge ${tagClass}">${item.category}</span>
                     <span class="card-date">${item.date}</span>
                 </div>
@@ -348,7 +381,7 @@ function selectRelease(release, focusComposer = false) {
     // Fill detailed view elements
     elements.selectedDate.textContent = release.date;
     
-    // Style workspace details badge
+    // Style workspace details category badge
     elements.selectedBadge.className = 'badge';
     const cat = release.category.toLowerCase();
     let badgeClass = 'badge-general';
@@ -358,7 +391,17 @@ function selectRelease(release, focusComposer = false) {
     elements.selectedBadge.classList.add(badgeClass);
     elements.selectedBadge.textContent = release.category;
     
-    elements.selectedTitle.textContent = `${release.category} Update`;
+    // Style workspace details source badge
+    elements.selectedSourceBadge.className = 'badge';
+    let sourceTagClass = 'badge-source-bq';
+    const src = release.source.toLowerCase();
+    if (src.includes('pyspark')) sourceTagClass = 'badge-source-pyspark';
+    else if (src.includes('snowflake')) sourceTagClass = 'badge-source-snowflake';
+    else if (src.includes('oracle')) sourceTagClass = 'badge-source-oracle';
+    elements.selectedSourceBadge.classList.add(sourceTagClass);
+    elements.selectedSourceBadge.textContent = release.source;
+    
+    elements.selectedTitle.textContent = `${release.source} • ${release.category}`;
     elements.selectedBody.innerHTML = release.content_html;
     
     // Set text to Composer Text Area

@@ -686,6 +686,54 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--badge-general-border);
 }
 
+.badge-source-bq {
+    color: #818cf8; /* Light Indigo */
+    background-color: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+body.light-theme .badge-source-bq {
+    color: #4f46e5;
+    background-color: rgba(79, 70, 229, 0.08);
+    border-color: rgba(79, 70, 229, 0.15);
+}
+
+.badge-source-pyspark {
+    color: #fb923c; /* Orange */
+    background-color: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.2);
+}
+
+body.light-theme .badge-source-pyspark {
+    color: #ea580c;
+    background-color: rgba(234, 88, 12, 0.08);
+    border-color: rgba(234, 88, 12, 0.15);
+}
+
+.badge-source-snowflake {
+    color: #38bdf8; /* Sky Blue */
+    background-color: rgba(14, 165, 233, 0.1);
+    border-color: rgba(14, 165, 233, 0.2);
+}
+
+body.light-theme .badge-source-snowflake {
+    color: #0284c7;
+    background-color: rgba(2, 132, 199, 0.08);
+    border-color: rgba(2, 132, 199, 0.15);
+}
+
+.badge-source-oracle {
+    color: #f87171; /* Red */
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+body.light-theme .badge-source-oracle {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.15);
+}
+
 .card-header-actions {
     display: flex;
     align-items: center;
