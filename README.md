@@ -1,4 +1,4 @@
-# DataDock Release Hub
+# Modern Data Engineering Release Explorer
 
 A high-fidelity, responsive web application that aggregates release updates from Google Cloud BigQuery, Apache Spark/PySpark, Snowflake, and Oracle 26ai, featuring an interactive social sharing workspace. Built with a lightweight **Python Flask** backend and a custom, premium **Vanilla HTML/JS/CSS** frontend.
 
