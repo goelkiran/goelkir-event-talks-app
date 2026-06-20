@@ -57,6 +57,22 @@
                 </div>
                 <div class="header-actions">
                     <span class="last-updated-text" id="last-updated">Last checked: Never</span>
+                    
+                    <!-- Theme Toggle Switch -->
+                    <div class="theme-toggle-wrapper">
+                        <i class="fa-regular fa-moon theme-icon" title="Dark Mode"></i>
+                        <label class="switch" for="theme-checkbox">
+                            <input type="checkbox" id="theme-checkbox">
+                            <span class="slider round"></span>
+                        </label>
+                        <i class="fa-regular fa-sun theme-icon" title="Light Mode"></i>
+                    </div>
+
+                    <button class="btn btn-secondary" id="btn-export" title="Export current list to CSV">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>Export CSV</span>
+                    </button>
+
                     <button class="btn btn-primary" id="btn-refresh">
                         <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
                         <span>Refresh Feed</span>

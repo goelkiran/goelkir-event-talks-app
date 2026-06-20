@@ -23,6 +23,8 @@ const elements = {
     emptyState: document.getElementById('empty-state'),
     searchInput: document.getElementById('search-input'),
     categoryFilters: document.getElementById('category-filters'),
+    btnExport: document.getElementById('btn-export'),
+    themeCheckbox: document.getElementById('theme-checkbox'),
     
     // Preview & Workspace Panel
     previewPanel: document.getElementById('preview-panel'),
@@ -59,6 +61,7 @@ const elements = {
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupProgressRing();
+    initTheme();
     fetchReleaseNotes(false);
 });
 
@@ -67,6 +70,22 @@ function setupEventListeners() {
     // Refresh button
     elements.btnRefresh.addEventListener('click', () => fetchReleaseNotes(true));
     
+    // Theme toggle switch
+    elements.themeCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            document.body.classList.add('light-theme');
+            localStorage.setItem('theme', 'light');
+            showToast("Switched to Light Mode", "info");
+        } else {
+            document.body.classList.remove('light-theme');
+            localStorage.setItem('theme', 'dark');
+            showToast("Switched to Dark Mode", "info");
+        }
+    });
+
+    // Export to CSV button
+    elements.btnExport.addEventListener('click', exportToCSV);
+
     // Search input with debounce
     let searchTimeout;
     elements.searchInput.addEventListener('input', (e) => {
@@ -273,19 +292,31 @@ function filterAndRenderNotes() {
                     <span class="badge ${tagClass}">${item.category}</span>
                     <span class="card-date">${item.date}</span>
                 </div>
-                <button class="tweet-shortcut-btn" title="Tweet this update">
-                    <i class="fa-brands fa-x-twitter"></i>
-                </button>
+                <div class="card-header-actions">
+                    <button class="card-action-btn btn-copy-card" title="Copy update text">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                    <button class="card-action-btn btn-tweet-card" title="Tweet this update">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 ${item.content_html}
             </div>
         `;
         
-        // Event listeners for card click and shortcut click
+        // Event listeners for card click and action buttons
         card.addEventListener('click', (e) => {
-            // If user clicked the shortcut tweet button inside the card header
-            if (e.target.closest('.tweet-shortcut-btn')) {
+            const copyBtn = e.target.closest('.btn-copy-card');
+            const tweetBtn = e.target.closest('.btn-tweet-card');
+            
+            if (copyBtn) {
+                e.stopPropagation();
+                navigator.clipboard.writeText(item.content_text)
+                    .then(() => showToast("Release notes copied to clipboard!", "success"))
+                    .catch(err => showToast("Failed to copy text: " + err, "error"));
+            } else if (tweetBtn) {
                 e.stopPropagation();
                 selectRelease(item, true); // Select and focus the composer input
             } else {
@@ -517,4 +548,54 @@ function renderSimulatedFeed() {
         
         elements.simulatedTweetsFeed.appendChild(item);
     });
+}
+
+// Initialize Theme from localStorage
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        elements.themeCheckbox.checked = true;
+        document.body.classList.add('light-theme');
+    }
+}
+
+// Export filtered release notes to CSV
+function exportToCSV() {
+    if (state.filteredReleases.length === 0) {
+        showToast("No release notes available to export.", "error");
+        return;
+    }
+    
+    // CSV Header row
+    const csvRows = [['Date', 'Category', 'Link', 'Content']];
+    
+    state.filteredReleases.forEach(item => {
+        // Double up existing double-quotes to escape them in CSV standard
+        const cleanText = item.content_text.replace(/"/g, '""');
+        const cleanDate = item.date.replace(/"/g, '""');
+        const cleanCategory = item.category.replace(/"/g, '""');
+        const cleanLink = item.link.replace(/"/g, '""');
+        
+        csvRows.push([
+            `"${cleanDate}"`,
+            `"${cleanCategory}"`,
+            `"${cleanLink}"`,
+            `"${cleanText}"`
+        ]);
+    });
+    
+    const csvString = csvRows.map(row => row.join(",")).join("\n");
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `bigquery_releases_${Date.now()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast(`Exported ${state.filteredReleases.length} entries to CSV!`, "success");
 }

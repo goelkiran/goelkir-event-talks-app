@@ -49,6 +49,142 @@
     --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ----------------------------------------------------
+   Light Mode Overrides & Toggle switch
+   ---------------------------------------------------- */
+body.light-theme {
+    --bg-app: #f8fafc; /* slate-50 */
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9; /* slate-100 */
+    --bg-input: #e2e8f0; /* slate-200 */
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color-active: rgba(99, 102, 241, 0.5);
+    
+    /* Text Colors */
+    --text-primary: #0f172a; /* slate-900 */
+    --text-secondary: #334155; /* slate-700 */
+    --text-muted: #64748b; /* slate-500 */
+    
+    /* Adjusted Badges for contrast in light mode */
+    --badge-feature-bg: rgba(16, 185, 129, 0.12);
+    --badge-changed-bg: rgba(245, 158, 11, 0.12);
+    --badge-deprecated-bg: rgba(239, 68, 68, 0.12);
+    --badge-general-bg: rgba(139, 92, 246, 0.12);
+}
+
+/* Light Theme tweaks for Composer Card & Simulations */
+body.light-theme .tweet-composer-card {
+    background-color: #ffffff;
+    border-color: #cfd9de;
+}
+body.light-theme .display-name {
+    color: #0f172a;
+}
+body.light-theme .handle {
+    color: #536471;
+}
+body.light-theme .twitter-x-logo {
+    color: #0f172a;
+}
+body.light-theme .tweet-composer-card textarea {
+    color: #0f172a;
+}
+body.light-theme .tweet-footer {
+    border-top-color: #cfd9de;
+}
+body.light-theme #char-count {
+    color: #536471;
+}
+body.light-theme .progress-ring__circle-bg {
+    stroke: #eff3f4;
+}
+body.light-theme .btn-twitter {
+    background-color: #0f172a;
+    color: #ffffff;
+}
+body.light-theme .btn-twitter:hover {
+    background-color: #27272a;
+}
+body.light-theme .mock-tweet-post {
+    background-color: #ffffff;
+    border-color: #cfd9de;
+}
+body.light-theme .tweet-post-body {
+    color: #0f172a;
+}
+body.light-theme .tweet-post-meta {
+    border-top-color: #cfd9de;
+    color: #536471;
+}
+
+/* Theme Toggle Slider */
+.theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--bg-input);
+    padding: 6px 12px;
+    border-radius: var(--radius-round);
+    border: 1px solid var(--border-color);
+}
+
+.theme-icon {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #64748b;
+    transition: var(--transition-fast);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition-fast);
+}
+
+input:checked + .slider {
+    background-color: var(--color-primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+.slider.round {
+    border-radius: var(--radius-round);
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
 /* Reset & Base Styles */
 * {
     margin: 0;
@@ -550,19 +686,45 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--badge-general-border);
 }
 
-.tweet-shortcut-btn {
+.card-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-action-btn {
     background: transparent;
     border: none;
     color: var(--text-muted);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: var(--transition-fast);
-    padding: 4px;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
 }
 
-.tweet-shortcut-btn:hover {
+.card-action-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+body.light-theme .card-action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.card-action-btn.btn-tweet-card:hover {
     color: var(--color-twitter);
-    transform: scale(1.15);
+    transform: scale(1.1);
+}
+
+.card-action-btn.btn-copy-card:hover {
+    color: var(--badge-feature-text);
+    transform: scale(1.1);
 }
 
 .card-body {
