@@ -34,7 +34,7 @@
                 </button>
                 <button class="nav-item" data-tab="simulation">
                     <i class="fa-brands fa-x-twitter"></i>
-                    <span>Simulated Tweets</span>
+                    <span>Simulated Microblogs</span>
                     <span class="badge-count" id="sim-count">0</span>
                 </button>
             </nav>
@@ -162,14 +162,24 @@
                                     <div class="details-body-html" id="selected-body"></div>
                                 </div>
 
-                                <!-- Twitter/X Composer Card Mock -->
-                                <div class="tweet-composer-card">
+                                <!-- Tab Switcher -->
+                                <div class="workspace-tabs">
+                                    <button class="w-tab active" id="w-tab-microblog">
+                                        <i class="fa-solid fa-feather-alt"></i> Microblog
+                                    </button>
+                                    <button class="w-tab" id="w-tab-blog">
+                                        <i class="fa-solid fa-newspaper"></i> 200-Word Blog
+                                    </button>
+                                </div>
+
+                                <!-- Microblog Composer Card -->
+                                <div class="tweet-composer-card" id="microblog-composer-section">
                                     <div class="tweet-header">
                                         <div class="tweet-profile">
                                             <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&auto=format&fit=crop&q=80" alt="Avatar" class="profile-avatar">
                                             <div class="profile-names">
                                                 <span class="display-name">Cloud Architect</span>
-                                                <span class="handle">@bq_navigator</span>
+                                                <span class="handle">@data_eng_watch</span>
                                             </div>
                                         </div>
                                         <div class="twitter-x-logo">
@@ -178,7 +188,7 @@
                                     </div>
 
                                     <div class="tweet-body">
-                                        <textarea id="tweet-textarea" rows="5" maxlength="280" placeholder="What is happening? Draft your update..."></textarea>
+                                        <textarea id="tweet-textarea" rows="5" maxlength="280" placeholder="Draft your microblog post..."></textarea>
                                     </div>
 
                                     <div class="tweet-footer">
@@ -204,6 +214,24 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- 200-Word Blog Composer Card -->
+                                <div class="tweet-composer-card hidden" id="blog-composer-section">
+                                    <div class="blog-header-meta">
+                                        <span class="blog-tag"><i class="fa-solid fa-file-pen"></i> Draft (UK English)</span>
+                                        <div class="word-counter-badge"><span id="blog-word-count">0</span> words</div>
+                                    </div>
+                                    <div class="tweet-body">
+                                        <textarea id="blog-textarea" rows="8" placeholder="Drafting your data engineering blog post..."></textarea>
+                                    </div>
+                                    <div class="tweet-footer">
+                                        <div class="tweet-actions-group" style="margin-left: auto;">
+                                            <button class="btn btn-secondary btn-sm" id="btn-copy-blog" title="Copy blog post to clipboard">
+                                                <i class="fa-regular fa-copy"></i> Copy Post
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -220,7 +248,7 @@
                     <div class="sim-empty-state" id="sim-empty">
                         <i class="fa-solid fa-paper-plane"></i>
                         <h3>Your feed is empty</h3>
-                        <p>Select a release note in the main tab, draft your tweet, and click "Simulate" to see it live here!</p>
+                        <p>Select a release note in the main tab, draft your microblog post, and click "Simulate" to see it live here!</p>
                     </div>
                 </div>
             </div>

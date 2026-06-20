@@ -39,13 +39,24 @@ const elements = {
     selectedBody: document.getElementById('selected-body'),
     btnCopyLink: document.getElementById('btn-copy-link'),
     
-    // Twitter/X Mock Composer
+    // Workspace Composers Tabs
+    wTabMicroblog: document.getElementById('w-tab-microblog'),
+    wTabBlog: document.getElementById('w-tab-blog'),
+    microblogSection: document.getElementById('microblog-composer-section'),
+    blogSection: document.getElementById('blog-composer-section'),
+    
+    // Microblog Composer
     tweetTextarea: document.getElementById('tweet-textarea'),
     charCount: document.getElementById('char-count'),
     progressCircle: document.querySelector('.progress-ring__circle'),
     btnCopyText: document.getElementById('btn-copy-text'),
     btnSimulateTweet: document.getElementById('btn-simulate-tweet'),
     btnPostTwitter: document.getElementById('btn-post-twitter'),
+    
+    // 200-Word Blog Composer
+    blogTextarea: document.getElementById('blog-textarea'),
+    blogWordCount: document.getElementById('blog-word-count'),
+    btnCopyBlog: document.getElementById('btn-copy-blog'),
     
     // Tabs & Navigation
     navItems: document.querySelectorAll('.nav-item'),
@@ -137,6 +148,38 @@ function setupEventListeners() {
     elements.btnCopyText.addEventListener('click', copyTweetText);
     elements.btnSimulateTweet.addEventListener('click', simulateTweet);
     elements.btnPostTwitter.addEventListener('click', postToTwitter);
+    
+    // Workspace tab switcher listeners
+    elements.wTabMicroblog.addEventListener('click', () => {
+        elements.wTabMicroblog.classList.add('active');
+        elements.wTabBlog.classList.remove('active');
+        elements.microblogSection.classList.remove('hidden');
+        elements.blogSection.classList.add('hidden');
+    });
+
+    elements.wTabBlog.addEventListener('click', () => {
+        elements.wTabBlog.classList.add('active');
+        elements.wTabMicroblog.classList.remove('active');
+        elements.blogSection.classList.remove('hidden');
+        elements.microblogSection.classList.add('hidden');
+    });
+
+    // 200-Word Blog copy button listener
+    elements.btnCopyBlog.addEventListener('click', () => {
+        const text = elements.blogTextarea.value;
+        if (!text.trim()) return;
+        
+        navigator.clipboard.writeText(text)
+            .then(() => showToast("Blog post copied to clipboard!", "success"))
+            .catch(err => showToast("Failed to copy blog post: " + err, "error"));
+    });
+
+    // 200-Word Blog textarea word counter
+    elements.blogTextarea.addEventListener('input', () => {
+        const text = elements.blogTextarea.value;
+        const words = text.split(/\s+/).filter(Boolean).length;
+        elements.blogWordCount.textContent = words;
+    });
     
     // Sidebar navigation tabs
     elements.navItems.forEach(item => {
@@ -404,8 +447,16 @@ function selectRelease(release, focusComposer = false) {
     elements.selectedTitle.textContent = `${release.source} • ${release.category}`;
     elements.selectedBody.innerHTML = release.content_html;
     
-    // Set text to Composer Text Area
+    // Set text to Microblog Text Area
     elements.tweetTextarea.value = release.tweet_text;
+    
+    // Generate UK English Blog Post
+    const blogText = generateBlogPostText(release);
+    elements.blogTextarea.value = blogText;
+    
+    // Count blog post words
+    const wordCount = blogText.split(/\s+/).filter(Boolean).length;
+    elements.blogWordCount.textContent = wordCount;
     
     // Run validation count metrics
     handleComposerInput();
@@ -641,4 +692,71 @@ function exportToCSV() {
     document.body.removeChild(link);
     
     showToast(`Exported ${state.filteredReleases.length} entries to CSV!`, "success");
+}
+
+// Convert US English text to UK English spelling
+function toUKEnglish(text) {
+    const dict = {
+        "optimized": "optimised",
+        "optimizing": "optimising",
+        "optimization": "optimisation",
+        "optimizations": "optimisations",
+        "synthesized": "synthesised",
+        "synthesizing": "synthesising",
+        "synthesis": "synthesisation",
+        "modeling": "modelling",
+        "color": "colour",
+        "colors": "colours",
+        "customization": "customisation",
+        "customizations": "customisations",
+        "program": "programme",
+        "programs": "programmes",
+        "analyzing": "analysing",
+        "behavior": "behaviour",
+        "behaviors": "behaviours",
+        "centralized": "centralised"
+    };
+    let clean = text;
+    Object.keys(dict).forEach(key => {
+        const regex = new RegExp(key, 'gi');
+        clean = clean.replace(regex, (match) => {
+            // Keep capitalisation format
+            if (match[0] === match[0].toUpperCase()) {
+                return dict[key][0].toUpperCase() + dict[key].slice(1);
+            }
+            return dict[key];
+        });
+    });
+    return clean;
+}
+
+// Generate a professional ~200-word engineering blog post draft in UK English
+function generateBlogPostText(release) {
+    const date = release.date;
+    const source = release.source;
+    const category = release.category;
+    
+    const title = `New ${category} Update Released for ${source} (${date})`;
+    
+    const intro = `The modern data engineering landscape has seen another significant advancement with the official announcement of a new ${category} update for ${source} on ${date}. This release introduces key capabilities designed to streamline analytical development, enhance schema execution performance, and optimise computational workloads across distributed setups.`;
+    
+    // Translate the release summary content to UK English spelling
+    const bodySnippet = toUKEnglish(release.content_text);
+    
+    const conclusion = `For data engineers and database administrators, integrating these latest enhancements is highly recommended to maintain peak operational efficiency and align with modern deployment best practices.`;
+    
+    const sourceQuote = `Source: Official ${source} Release Notes — ${release.link}`;
+    
+    // Compile hashtags based on source & category
+    let hashtags = '#DataEngineering #CloudData #Analytics';
+    if (source === 'BigQuery') hashtags = '#BigQuery #GoogleCloud #DataWarehousing #Analytics';
+    else if (source === 'PySpark') hashtags = '#PySpark #ApacheSpark #BigData #Python';
+    else if (source === 'Snowflake') hashtags = '#Snowflake #CloudData #Database #Analytics';
+    else if (source === 'Oracle 26ai') hashtags = '#Oracle #Database #AIVectorSearch #DatabaseAdmin';
+    
+    if (category === 'Feature') hashtags += ' #FeatureRelease';
+    else if (category === 'Changed') hashtags += ' #PlatformUpdate';
+    
+    const fullPost = `${title}\n\n${intro}\n\n${bodySnippet}\n\n${conclusion}\n\n${sourceQuote}\n\n${hashtags}`;
+    return fullPost;
 }
